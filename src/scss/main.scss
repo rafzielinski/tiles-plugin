@@ -1,0 +1,170 @@
+@import 'utils';
+
+$breakpoints: (
+  xsmall: 300px,
+  small: 450px,
+  medium: 920px,
+  large: 1280px
+);
+
+$custom-bp: 450px;
+
+$dark: rgb(41, 35, 77);
+$bg: fade-out($dark, .9);
+$border: 1px solid fade-out($dark, .5);
+
+//
+// OPTIONS
+
+$gap: 1em;
+$steps: (
+  // label: [breakpoint] [number of items in a row]
+  default: 0 1, // REQUIRED
+  xsmall: 300px 2,
+  small: $custom-bp 3,
+  medium: map-get($breakpoints, medium) 7,
+  large: 1280px 10
+);
+
+*, *::before, *::after { box-sizing: border-box }
+
+html, body { font: 16px/1.5 sans-serif }
+
+.tf { &-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+
+    padding: $gap/2;
+
+    width: 100%;
+
+    background: $bg;
+
+    transition: opacity 300ms ease;
+  }
+
+  &-item {
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+
+    height: 100%;
+
+    background: $bg;
+    border: $border;
+
+    transition: box-shadow 250ms;
+
+    @each $key, $values in $steps {
+      @if $key == 'default' { // Generate default styles w/o breakpoint
+        @each $val in $values {
+          $i: index($values, $val);
+          @if $i == 2 { // Generate styles in breakpoint from second value in map
+            flex: 1 0 calc(100% / #{getValueByIndex($i, 2, $val)});
+            max-width: calc(100% / #{getValueByIndex($i, 2, $val)});
+            @include generateChildsStyles(getValueByIndex($i, 2, $val))
+          }
+        }
+      } @else {
+        @each $val in $values {
+          $i: index($values, $val);
+          @if $i == 1 { // Generate breakpoint from first value in map
+            @include screen(getValueByIndex($i, 1, $val)) {
+              @each $val in $values {
+                $i: index($values, $val);
+                @if $i == 2 { // Generate styles in breakpoint from second value in map
+                  flex: 1 0 calc(100% / #{getValueByIndex($i, 2, $val)});
+                  max-width: calc(100% / #{getValueByIndex($i, 2, $val)});
+                  @include generateChildsStyles(getValueByIndex($i, 2, $val))
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &_top {
+      padding: 0;
+      margin: $gap/2;
+
+      text-align: left;
+
+      background: $bg;
+      border: none;
+      outline: 0;
+      opacity: 1;
+      transition: opacity 300ms ease;
+
+      pointer-events: none;
+
+      appearance: none;
+      cursor: pointer;
+
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+
+        pointer-events: none;
+      }
+    }
+
+    &_bottom {
+      display: none;
+      align-self: flex-start;
+
+      position: relative;
+
+      padding: $gap/2;
+
+      max-height: 0;
+
+      background: $bg;
+
+      transition: all 300ms;
+      transition: max-height 1s ease;
+
+      @each $key, $values in $steps {
+        @if $key == 'default' { // Generate default styles w/o breakpoint
+          @each $val in $values {
+            $i: index($values, $val);
+            @if $i == 2 { // Generate styles in breakpoint from second value in map
+              width: calc(100% * #{getValueByIndex($i, 2, $val)});
+            }
+          }
+        } @else {
+          @each $val in $values {
+            $i: index($values, $val);
+            @if $i == 1 { // Generate breakpoint from val 1
+              @include screen(getValueByIndex($i, 1, $val)) {
+                @each $val in $values {
+                  $i: index($values, $val);
+                  @if $i == 2 { // Generate styles in breakpoint from second value in map
+                    width: calc(100% * #{getValueByIndex($i, 2, $val)});
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      &--open {
+        display: block;
+
+        max-height: 999em;
+      }
+
+      &-inner {
+        padding: $gap;
+
+        width: 100%;
+        height: auto;
+
+        background: white;
+      }
+    }
+  }
+}

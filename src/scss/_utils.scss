@@ -1,0 +1,29 @@
+@mixin screen($bp) {
+  @media screen and (min-width: #{$bp}) {
+    @content;
+  }
+}
+
+@function getValueByIndex($i, $f, $v) {
+  $val: 0;
+  @if ($i == $f) {
+    $val: $v;
+  }
+  @return $val;
+}
+
+@mixin generateChildsStyles($count) {
+  @for $i from 1 through $count {
+    $base: 100% / $count;
+    $var: $i - 1;
+
+    &:nth-child(#{$count}n + #{$i}) &_bottom {
+      transform: translateX(calc(#{$base} * -#{$var}));
+    }
+  }
+}
+
+@function ends-with($string, $find) {
+  @return str-slice($string, (str-length($string) - str-length($find) + 1)) == $find;
+}
+
